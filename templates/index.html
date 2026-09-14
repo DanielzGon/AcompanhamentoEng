@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Curso</title>
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f4f9; }
+        h1, h2 { color: #333; }
+        
+        .progresso-container { width: 100%; background-color: #ddd; border-radius: 20px; margin-bottom: 30px; }
+        .progresso-barra { height: 30px; background-color: #4CAF50; border-radius: 20px; text-align: center; line-height: 30px; color: white; font-weight: bold; transition: width 0.5s; }
+        
+        .aba-cursando { background-color: #e2e8f0; padding: 20px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #fd7e14; }
+        .titulo-periodo { margin-top: 40px; border-bottom: 2px solid #ccc; padding-bottom: 10px; color: #444; }
+        
+        /* Estilos do Guia de Períodos */
+        .guia-periodos {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .guia-periodos a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: #f4f4f9;
+            transition: 0.2s;
+        }
+        .guia-periodos a:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .card { 
+            background: white; padding: 15px; margin-bottom: 10px; 
+            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        
+        .status-Concluída { color: #28a745; font-weight: bold; }
+        .status-Cursando { color: #fd7e14; font-weight: bold; }
+        .status-Disponível { color: #007bff; font-weight: bold; }
+        .status-Bloqueada { color: #dc3545; font-weight: bold; }
+
+        .btn { padding: 8px 12px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
+        .btn:hover { opacity: 0.8; }
+        .btn-cursar { background-color: #007bff; }
+        .btn-concluir { background-color: #28a745; }
+        .btn-desfazer { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+
+    <h1>Acompanhamento de Curso - Eng. Computação</h1>
+    
+    <h3>Progresso Atual</h3>
+    <div class="progresso-container">
+        <div class="progresso-barra" style="width: {{ porcentagem }}%;">{{ porcentagem }}%</div>
+    </div>
+
+    <!-- Seção Cursando Atualmente -->
+    {% if disciplinas_cursando %}
+    <div class="aba-cursando">
+        <h2>📚 Semestre Atual (Cursando)</h2>
+        {% for d in disciplinas_cursando %}
+        <div class="card">
+            <div>
+                <strong>{{ d.nome }}</strong> ({{ d.periodo }}º Período) <br>
+                Status: <span class="status-{{ d.status }}">{{ d.status }}</span>
+            </div>
+            <div>
+                <a href="/atualizar/{{ d.id }}/Concluída" class="btn btn-concluir">Concluir</a>
+                <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2>Minhas Disciplinas</h2>
+    
+    <!-- Guia Rápido de Navegação -->
+    <div class="guia-periodos">
+        {% for periodo in disciplinas_por_periodo.keys() %}
+            <a href="#periodo-{{ periodo }}">{{ periodo }}º Período</a>
+        {% endfor %}
+    </div>
+    
+    {% for periodo, materias in disciplinas_por_periodo.items() %}
+        
+        <!-- Título com o ID para a âncora funcionar -->
+        <h2 id="periodo-{{ periodo }}" class="titulo-periodo">{{ periodo }}º Período</h2>
+        
+        {% for d in materias %}
+        <div class="card">
+            <div>
+                <strong>{{ d.nome }}</strong> <br>
+                Status: <span class="status-{{ d.status }}">{{ d.status }}</span>
+                
+                <!-- Exibe os pré-requisitos apenas se a matéria tiver algum -->
+                {% if d.nomes_prerequisitos %}
+                    <br><small style="color: #777;"><i>Exige: {{ d.nomes_prerequisitos }}</i></small>
+                {% endif %}
+            </div>
+            
+            <div>
+                {% if d.status == 'Disponível' %}
+                    <a href="/atualizar/{{ d.id }}/Cursando" class="btn btn-cursar">Cursar</a>
+                {% elif d.status == 'Cursando' %}
+                    <a href="/atualizar/{{ d.id }}/Concluída" class="btn btn-concluir">Concluir</a>
+                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+                {% elif d.status == 'Concluída' %}
+                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+        
+    {% endfor %}
+
+    <!-- Script para atualizar a página sem piscar e manter a barra de rolagem -->
+    <script>
+        document.addEventListener('click', function(event) {
+            // Verifica se clicou em um botão de ação (ignorando os links do guia rápido)
+            if (event.target.classList.contains('btn')) {
+                event.preventDefault(); 
+
+                let url = event.target.href; 
+                let scrollAtual = window.scrollY; 
+
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        let parser = new DOMParser();
+                        let novoDocumento = parser.parseFromString(html, 'text/html');
+                        
+                        document.body.innerHTML = novoDocumento.body.innerHTML;
+                        window.scrollTo(0, scrollAtual);
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
