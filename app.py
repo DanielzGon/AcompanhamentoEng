@@ -5,11 +5,16 @@ import os
 
 app = Flask(__name__)
 
+# --- NOVO: Descobre o caminho absoluto exato da pasta atual no servidor ---
+DIRETORIO_BASE = os.path.dirname(os.path.abspath(__file__))
+CAMINHO_BANCO = os.path.join(DIRETORIO_BASE, 'banco.db')
+CAMINHO_JSON = os.path.join(DIRETORIO_BASE, 'grade.json')
+
 def iniciar_banco():
-    conn = sqlite3.connect('banco.db')
+    # Agora usa o caminho absoluto
+    conn = sqlite3.connect(CAMINHO_BANCO)
     cursor = conn.cursor()
     
-    # Criação das tabelas com ID como TEXT
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS disciplinas (
             id TEXT PRIMARY KEY,
@@ -28,13 +33,11 @@ def iniciar_banco():
         )
     ''')
     
-    # Verifica se o banco está vazio
     cursor.execute('SELECT COUNT(*) FROM disciplinas')
     if cursor.fetchone()[0] == 0:
         
-        # Lê o arquivo JSON com a matriz
-        caminho_json = os.path.join(os.path.dirname(__file__), 'grade.json')
-        with open(caminho_json, 'r', encoding='utf-8') as arquivo:
+        # Agora usa o caminho absoluto para o JSON
+        with open(CAMINHO_JSON, 'r', encoding='utf-8') as arquivo:
             grade = json.load(arquivo)
             
         materias_para_inserir = []
@@ -51,16 +54,19 @@ def iniciar_banco():
             for requisito in disciplina['pre_requisitos']:
                 trancas_para_inserir.append((disciplina['id'], requisito))
                 
-        # Insere tudo no banco
         cursor.executemany('INSERT INTO disciplinas VALUES (?, ?, ?, ?)', materias_para_inserir)
         cursor.executemany('INSERT INTO pre_requisitos VALUES (?, ?)', trancas_para_inserir)
         conn.commit()
         
     conn.close()
 
+# --- NOVO: Executa a criação do banco solta no código, para o servidor não ignorar ---
+iniciar_banco()
+
 @app.route('/')
 def index():
-    conn = sqlite3.connect('banco.db')
+    # Usando o caminho absoluto
+    conn = sqlite3.connect(CAMINHO_BANCO)
     conn.row_factory = sqlite3.Row 
     cursor = conn.cursor()
     
@@ -80,7 +86,6 @@ def index():
         
     concluidas_ids = [d['id'] for d in disciplinas_bd if d['status'] == 'Concluída']
     
-    # Dicionário tradutor (ID -> Nome)
     nomes_disciplinas = {d['id']: d['nome'] for d in disciplinas_bd}
     
     disciplinas_processadas = []
@@ -88,7 +93,6 @@ def index():
         materia = dict(d)
         reqs_desta_materia = requisitos_dit.get(materia['id'], [])
         
-        # Traduz os IDs para os nomes
         nomes_reqs = [nomes_disciplinas.get(req, req) for req in reqs_desta_materia]
         materia['nomes_prerequisitos'] = ", ".join(nomes_reqs)
         
@@ -108,7 +112,6 @@ def index():
     concluidas = len(concluidas_ids)
     porcentagem = int((concluidas / total) * 100) if total > 0 else 0
     
-    # Agrupando por período
     disciplinas_por_periodo = {}
     for d in disciplinas_processadas:
         p = d['periodo']
@@ -116,7 +119,6 @@ def index():
             disciplinas_por_periodo[p] = [] 
         disciplinas_por_periodo[p].append(d) 
         
-    # Lista com as matérias cursadas atualmente
     disciplinas_cursando = [d for d in disciplinas_processadas if d['status'] == 'Cursando']
         
     return render_template('index.html', 
@@ -126,7 +128,8 @@ def index():
 
 @app.route('/atualizar/<string:id_materia>/<novo_status>')
 def atualizar_status(id_materia, novo_status):
-    conn = sqlite3.connect('banco.db')
+    # Usando o caminho absoluto
+    conn = sqlite3.connect(CAMINHO_BANCO)
     cursor = conn.cursor()
     
     cursor.execute('UPDATE disciplinas SET status = ? WHERE id = ?', (novo_status, id_materia))
@@ -136,5 +139,4 @@ def atualizar_status(id_materia, novo_status):
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    iniciar_banco()
     app.run(debug=True)
