@@ -2,85 +2,85 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Meu Curso</title>
+    <title>Acompanhamento de Disciplinas</title>
     <style>
         html { scroll-behavior: smooth; }
-        
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f4f9; }
-        h1, h2 { color: #333; }
-        
-        .progresso-container { width: 100%; background-color: #ddd; border-radius: 20px; margin-bottom: 30px; }
-        .progresso-barra { height: 30px; background-color: #4CAF50; border-radius: 20px; text-align: center; line-height: 30px; color: white; font-weight: bold; transition: width 0.5s; }
-        
-        .aba-cursando { background-color: #e2e8f0; padding: 20px; border-radius: 10px; margin-bottom: 40px; border-left: 5px solid #fd7e14; }
-        .titulo-periodo { margin-top: 40px; border-bottom: 2px solid #ccc; padding-bottom: 10px; color: #444; }
-        
-        /* Estilos do Guia de Períodos */
-        .guia-periodos {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .guia-periodos a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-            padding: 8px 12px;
-            border-radius: 5px;
-            background-color: #f4f4f9;
-            transition: 0.2s;
-        }
-        .guia-periodos a:hover {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .card { 
-            background: white; padding: 15px; margin-bottom: 10px; 
-            border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
-        .status-Concluída { color: #28a745; font-weight: bold; }
-        .status-Cursando { color: #fd7e14; font-weight: bold; }
-        .status-Disponível { color: #007bff; font-weight: bold; }
-        .status-Bloqueada { color: #dc3545; font-weight: bold; }
 
-        .btn { padding: 8px 12px; border-radius: 5px; text-decoration: none; font-size: 14px; font-weight: bold; color: white; cursor: pointer; transition: 0.2s; }
-        .btn:hover { opacity: 0.8; }
-        .btn-cursar { background-color: #007bff; }
-        .btn-concluir { background-color: #28a745; }
-        .btn-desfazer { background-color: #6c757d; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 40px; background: #ffffff; color: #1a1a1a; }
+
+        h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.5px; }
+
+        .subtitulo { font-size: 16px; color: #555; margin-bottom: 32px; font-weight: 400; }
+
+        /* Barra de progresso */
+        .progresso { margin-bottom: 40px; }
+        .progresso-linha { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+        .progresso-label { color: #555; font-weight: 500; }
+        .progresso-valor { color: #1a1a1a; font-weight: 600; }
+        .progresso-container { width: 100%; height: 8px; background: #eaeaea; border: 1px solid #d9d9d9; overflow: hidden; }
+        .progresso-barra { height: 100%; background: #1a1a1a; width: {{ porcentagem }}%; transition: width 0.3s ease; }
+
+        /* Seção semestre atual */
+        .semestre-atual { border-top: 1px solid #d9d9d9; border-bottom: 1px solid #d9d9d9; padding: 24px 0; margin-bottom: 40px; }
+        .semestre-atual h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+
+        .item { display: flex; align-items: baseline; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .item:last-child { border-bottom: none; }
+
+        .item .info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .item .info strong { font-weight: 600; }
+        .item .info .periodo { font-size: 13px; color: #666; margin-top: 2px; }
+        .item .info .prereq { font-size: 13px; color: #666; margin-top: 4px; }
+
+        .item .status { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; padding-right: 24px; }
+        .status-Concluída { color: #1a1a1a; }
+        .status-Cursando { color: #555; }
+        .status-Disponível { color: #555; }
+        .status-Bloqueada { color: #888; }
+
+        .item .acoes { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .btn { padding: 6px 14px; font-size: 13px; border: 1px solid #999; background: #fff; color: #1a1a1a; cursor: pointer; border-radius: 3px; transition: all 0.1s ease; text-decoration: none; display: inline-block; line-height: normal; white-space: nowrap; }
+        .btn:hover { border-color: #1a1a1a; background: #f5f5f5; }
+        .btn:active { background: #eaeaea; }
+
+        /* Guia de periods */
+        .guia-periodos { margin-bottom: 32px; }
+        .guia-periodos a { text-decoration: none; color: #1a1a1a; font-size: 14px; padding: 6px 12px; border: 1px solid #d9d9d9; border-radius: 3px; margin-right: 8px; margin-bottom: 6px; display: inline-block; }
+        .guia-periodos a:hover { background: #f5f5f5; border-color: #999; }
+
+        .titulo-periodo { font-size: 17px; font-weight: 600; margin-top: 32px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #d9d9d9; }
+
     </style>
 </head>
 <body>
 
-    <h1>Acompanhamento de Curso - Eng. Computação</h1>
-    
-    <h3>Progresso Atual</h3>
-    <div class="progresso-container">
-        <div class="progresso-barra" style="width: {{ porcentagem }}%;">{{ porcentagem }}%</div>
+    <h1>Acompanhamento de Disciplinas</h1>
+    <div class="subtitulo">Engenharia da Computação</div>
+
+    <div class="progresso">
+        <div class="progresso-linha">
+            <span class="progresso-label">Progresso do curso</span>
+            <span class="progresso-valor">{{ porcentagem }}%</span>
+        </div>
+        <div class="progresso-container">
+            <div class="progresso-barra" style="width: {{ porcentagem }}%;"></div>
+        </div>
     </div>
 
     <!-- Seção Cursando Atualmente -->
     {% if disciplinas_cursando %}
-    <div class="aba-cursando">
-        <h2>📚 Semestre Atual (Cursando)</h2>
+    <div class="semestre-atual">
+        <h2>Semestre Atual</h2>
         {% for d in disciplinas_cursando %}
-        <div class="card">
-            <div>
-                <strong>{{ d.nome }}</strong> ({{ d.periodo }}º Período) <br>
-                Status: <span class="status-{{ d.status }}">{{ d.status }}</span>
+        <div class="item semestre">
+            <div class="info">
+                <strong>{{ d.nome }}</strong>
+                <span class="periodo">{{ d.periodo }}º Período</span>
             </div>
-            <div>
-                <a href="/atualizar/{{ d.id }}/Concluída" class="btn btn-concluir">Concluir</a>
-                <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+            <div class="acoes">
+                <a href="/atualizar/{{ d.id }}/Concluída" class="btn">Concluir</a>
+                <a href="/atualizar/{{ d.id }}/Pendente" class="btn">Desfazer</a>
             </div>
         </div>
         {% endfor %}
@@ -88,62 +88,57 @@
     {% endif %}
 
     <h2>Minhas Disciplinas</h2>
-    
-    <!-- Guia Rápido de Navegação -->
+
     <div class="guia-periodos">
         {% for periodo in disciplinas_por_periodo.keys() %}
             <a href="#periodo-{{ periodo }}">{{ periodo }}º Período</a>
         {% endfor %}
     </div>
-    
+
     {% for periodo, materias in disciplinas_por_periodo.items() %}
-        
-        <!-- Título com o ID para a âncora funcionar -->
         <h2 id="periodo-{{ periodo }}" class="titulo-periodo">{{ periodo }}º Período</h2>
-        
+
         {% for d in materias %}
-        <div class="card">
-            <div>
-                <strong>{{ d.nome }}</strong> <br>
-                Status: <span class="status-{{ d.status }}">{{ d.status }}</span>
-                
-                <!-- Exibe os pré-requisitos apenas se a matéria tiver algum -->
+        <div class="item disciplina">
+            <div class="info">
+                <strong>{{ d.nome }}</strong>
                 {% if d.nomes_prerequisitos %}
-                    <br><small style="color: #777;"><i>Exige: {{ d.nomes_prerequisitos }}</i></small>
+                <span class="prereq">Pré-requisitos: {{ d.nomes_prerequisitos }}</span>
+                {% else %}
+                <span class="periodo">{{ d.periodo }}º Período</span>
                 {% endif %}
             </div>
-            
-            <div>
+            <div class="status status-{{ d.status }}">{{ d.status }}</div>
+            <div class="acoes">
                 {% if d.status == 'Disponível' %}
-                    <a href="/atualizar/{{ d.id }}/Cursando" class="btn btn-cursar">Cursar</a>
+                    <a href="/atualizar/{{ d.id }}/Cursando" class="btn">Cursar</a>
                 {% elif d.status == 'Cursando' %}
-                    <a href="/atualizar/{{ d.id }}/Concluída" class="btn btn-concluir">Concluir</a>
-                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+                    <a href="/atualizar/{{ d.id }}/Concluída" class="btn">Concluir</a>
+                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn">Desfazer</a>
                 {% elif d.status == 'Concluída' %}
-                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn btn-desfazer">Desfazer</a>
+                    <a href="/atualizar/{{ d.id }}/Pendente" class="btn">Desfazer</a>
                 {% endif %}
             </div>
         </div>
         {% endfor %}
-        
+
     {% endfor %}
 
     <!-- Script para atualizar a página sem piscar e manter a barra de rolagem -->
     <script>
         document.addEventListener('click', function(event) {
-            // Verifica se clicou em um botão de ação (ignorando os links do guia rápido)
             if (event.target.classList.contains('btn')) {
-                event.preventDefault(); 
+                event.preventDefault();
 
-                let url = event.target.href; 
-                let scrollAtual = window.scrollY; 
+                let url = event.target.href;
+                let scrollAtual = window.scrollY;
 
                 fetch(url)
                     .then(response => response.text())
                     .then(html => {
                         let parser = new DOMParser();
                         let novoDocumento = parser.parseFromString(html, 'text/html');
-                        
+
                         document.body.innerHTML = novoDocumento.body.innerHTML;
                         window.scrollTo(0, scrollAtual);
                     });
